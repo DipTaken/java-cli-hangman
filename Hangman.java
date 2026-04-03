@@ -1,4 +1,3 @@
-
 import java.util.Random;
 import java.util.Scanner;
 
@@ -37,23 +36,21 @@ public class Hangman {
         GameState gameState = new GameState(word);
         
         //UI-guessing
-        PrintCharArray(gameState.wordInProgress);
-        System.out.println("You have " + gameState.lives + " lives to get the word!\n");
+        PrintCharArray(gameState.WordInProgress());
+        System.out.println("You have " + gameState.Lives() + " lives to get the word!\n");
 
         //main loop
-        boolean won = false;
-        while (gameState.lives > 0) { //continues until user runs out of lives
+        while (gameState.Lives() > 0) { //continues until user runs out of lives
             System.out.print("Make a guess! "); // asks for a guess
             char guessedChar = GrabChar();
             guessedChar = ValidateGuess(gameState, guessedChar);
             DisplayGuess(gameState, guessedChar);
             
             if (UserHasWon(gameState)) {
-                System.out.println("You win! It took you " + gameState.guesses + " tries to win.");
+                System.out.println("You win! It took you " + gameState.Guesses() + " tries to win.");
                 System.out.print("The word was: ");
                 PrintCharArray(word);
                 System.out.println();
-                won = true;
                 break;
             }
 
@@ -61,7 +58,7 @@ public class Hangman {
         }
 
         //if user did not win
-        if (!won) {
+        if (!UserHasWon(gameState)) {
             System.out.println("You did not get the word correct.");
             System.out.print("The word was: ");
             PrintCharArray(word);
@@ -74,43 +71,21 @@ public class Hangman {
     }
 
     public static void DisplayGuess(GameState gameState, char guessedChar) {
-        //checks if guess is correct or not
-        if (InWord(gameState, guessedChar)) {
-            //adds it to the word in progress
-            for (int i = 0; i < gameState.wordLength; i++) {
-                if (guessedChar == gameState.word[i]) {
-                    gameState.wordInProgress[i] = guessedChar;
-                    gameState.correctLetters++;
-                }
-            }
-
-            //adds it to the correct word array
-            gameState.correctGuesses[gameState.correctGuessesIndex] = guessedChar;
-            gameState.correctGuessesIndex++;
-        }
-        else {
-            //adds it to the incorrect word array
-            gameState.incorrectGuesses[gameState.incorrectGuessesIndex] = guessedChar;
-            gameState.incorrectGuessesIndex++;
-            gameState.lives--; //subtracts a life for an incorrect guess
-        }
-
-        gameState.alreadyGuessed[guessedChar - 'a'] = true; // adds the guessed letter to the direct address table for duplicate checking
-        gameState.guesses++;
+        gameState.RecordGuess(guessedChar); //updates gamestate with the guess
 
         //displays word in progress, correct, incorrect, and lives
         System.out.println();
-        PrintCharArray(gameState.wordInProgress);
+        PrintCharArray(gameState.WordInProgress());
         System.out.print("Correct guesses: ");
-        PrintCharArray(gameState.correctGuesses);
+        PrintCharArray(gameState.CorrectGuesses());
         System.out.print("Incorrect guesses: ");
-        PrintCharArray(gameState.incorrectGuesses);    
-        System.out.println("You have " + gameState.lives + " lives left.\n");
+        PrintCharArray(gameState.IncorrectGuesses());
+        System.out.println("You have " + gameState.Lives() + " lives left.\n");
     }
         
     public static char ValidateGuess(GameState gameState, char guessedChar) {
         //prompts the user to enter a valid guess if they entered an invalid character or a duplicate character, and continues to prompt until they enter a valid guess
-        while (!ValidChar(guessedChar) || IsDuplicate(gameState, guessedChar)) {
+        while (!ValidChar(guessedChar) || gameState.IsDuplicate(guessedChar)) {
             if (!ValidChar(guessedChar)) {
                 System.out.print("Invalid character! Please choose another one. ");
             }
@@ -122,6 +97,15 @@ public class Hangman {
             guessedChar = GrabChar(); //takes the next guess and validates it again
         }
         return guessedChar;
+    }
+
+    public static boolean ValidChar(char guessedChar) {   
+        //makes sure that the guess is a letter from a-z, lower and upper case
+        return guessedChar >= 'A' && guessedChar <= 'Z' || guessedChar >= 'a' && guessedChar <= 'z';
+    }
+
+    public static boolean UserHasWon(GameState gameState) {
+        return gameState.CorrectLetters() == gameState.WordLength(); // user wins if the number of correct letters guessed is equal to the length of the word
     }
 
     public static char[] PickRandomWord(String[] wordBank) {
@@ -136,29 +120,9 @@ public class Hangman {
         return word;
     }
 
-    public static boolean InWord(GameState gameState, char guessedChar) {
-        //checks if the guessed letter matches any letters in the word using a direct address table
-        int index = guessedChar - 'a';
-        return gameState.characterMap[index];
-    }
-
     public static void PrintCharArray(char[] arr){
         //prints every element in a char[] array
         for (char c: arr) System.out.print(c + " ");
         System.out.println();
-    }
-    
-    public static boolean ValidChar(char guessedChar) {   
-        //makes sure that the guess is a letter from a-z, lower and upper case
-        return guessedChar >= 'A' && guessedChar <= 'Z' || guessedChar >= 'a' && guessedChar <= 'z';
-    }
-
-    public static boolean IsDuplicate(GameState gameState, char guessedChar) {
-        int index = guessedChar - 'a';
-        return gameState.alreadyGuessed[index]; // checks if the guessed letter has already been guessed using a direct address table
-    }
-
-    public static boolean UserHasWon(GameState gameState) {
-        return gameState.correctLetters == gameState.wordLength; // user wins if the number of correct letters guessed is equal to the length of the word
     }
 }

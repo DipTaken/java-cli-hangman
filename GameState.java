@@ -1,20 +1,22 @@
 public class GameState {
     private static final int ALPHABET_SIZE = 26;
+
+    //vars that will never appear outside of this class
+    private final char[] word;
+    private int correctGuessesIndex = 0;
+    private int incorrectGuessesIndex = 0;
+    private final boolean[] characterMap; // keeps track of guessed letters for O(1) duplicate checking
+    private final boolean[] alreadyGuessed = new boolean[ALPHABET_SIZE]; 
+ 
+    //vars that can be accessed outside of this class using getters
+    private int correctLetters = 0;
+    private int guesses = 0;
+    private int lives;
+    private final int wordLength;
+    private final char[] wordInProgress;
+    private final char[] correctGuesses;
+    private final char[] incorrectGuesses;
     
-    public final char[] word;
-    public final char[] wordInProgress;
-    public final char[] correctGuesses;
-    public final char[] incorrectGuesses;
-    public final int wordLength;
-    public final boolean[] characterMap;
-
-    public int guesses = 0;
-    public int lives;
-    public int correctLetters = 0;
-    public int correctGuessesIndex = 0;
-    public int incorrectGuessesIndex = 0;
-    public boolean[] alreadyGuessed = new boolean[ALPHABET_SIZE]; // keeps track of guessed letters for O(1) duplicate checking
-
     public GameState(char[] targetWord) {
         this.word = targetWord;
         this.wordLength = targetWord.length;
@@ -53,4 +55,48 @@ public class GameState {
         return map;
     }
 
+    //used for mutating gamestate
+    public void RecordGuess(char guessedChar) {
+        //checks if guess is correct or not
+        if (InWord(guessedChar)) {
+            //adds it to the word in progress
+            for (int i = 0; i < this.wordLength; i++) {
+                if (guessedChar == this.word[i]) {
+                    this.wordInProgress[i] = guessedChar;
+                    this.correctLetters++;
+                }
+            }
+            //adds it to the correct word array
+            this.correctGuesses[this.correctGuessesIndex] = guessedChar;
+            this.correctGuessesIndex++;
+        }
+        else {
+            //adds it to the incorrect word array
+            this.incorrectGuesses[this.incorrectGuessesIndex] = guessedChar;
+            this.incorrectGuessesIndex++;
+            this.lives--; //subtracts a life for an incorrect guess
+        }
+        this.alreadyGuessed[guessedChar - 'a'] = true; // adds the guessed letter to the direct address table for duplicate checking
+        this.guesses++;
+    }
+
+    private boolean InWord(char guessedChar) {
+        //checks if the guessed letter matches any letters in the word using a direct address table
+        int index = guessedChar - 'a';
+        return this.characterMap[index];
+    }
+
+    public boolean IsDuplicate(char guessedChar) {
+        int index = guessedChar - 'a';
+        return this.alreadyGuessed[index]; // checks if the guessed letter has already been guessed using a direct address table
+    }
+
+    //getters for vars
+    public int Lives() { return lives; }
+    public int Guesses() { return guesses; }
+    public int WordLength() { return wordLength; }
+    public int CorrectLetters() { return correctLetters; }
+    public char[] WordInProgress() { return wordInProgress; }
+    public char[] CorrectGuesses() { return correctGuesses; }
+    public char[] IncorrectGuesses() { return incorrectGuesses; }
 }
