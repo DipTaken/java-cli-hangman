@@ -39,16 +39,17 @@ public class Hangman {
         
         //UI-guessing
         PrintCharArray(gameState.wordInProgress);
-        System.out.println("You have " + gameState.totalGuesses + " guesses to get the word.\n");
+        //System.out.println("You have " + gameState.totalGuesses + " guesses to get the word.\n"); //old guessing system based on number of guesses
+        System.out.println("You have " + gameState.lives + " lives to get the word!\n");
 
         //main loop
-        for (int i = 0; i < gameState.totalGuesses; i++) {
+        while (gameState.lives > 0) { //continues until user runs out of lives
             System.out.print("Make a guess! "); // asks for a guess
             char guessedChar = GrabChar();
             guessedChar = ValidateGuess(gameState, guessedChar);
             DisplayGuess(gameState, guessedChar);
             
-            if (UserHasWon(gameState, word)) {
+            if (UserHasWon(gameState)) {
                 System.out.println("You win! It took you " + gameState.guesses + " tries to win.");
                 System.out.print("The word was: ");
                 PrintCharArray(word);
@@ -60,7 +61,7 @@ public class Hangman {
         }
 
         //if user did not win
-        if (!UserHasWon(gameState, word)) {
+        if (!UserHasWon(gameState)) {
             System.out.println("You did not get the word correct.");
             System.out.print("The word was: ");
             PrintCharArray(word);
@@ -82,6 +83,7 @@ public class Hangman {
                     gameState.correctLetters++;
                 }
             }
+
             //adds it to the correct word array
             gameState.correctGuesses[gameState.correctGuessesIndex] = guessedChar;
             gameState.correctGuessesIndex++;
@@ -90,19 +92,21 @@ public class Hangman {
             //adds it to the incorrect word array
             gameState.incorrectGuesses[gameState.incorrectGuessesIndex] = guessedChar;
             gameState.incorrectGuessesIndex++;
+            gameState.lives--; //subtracts a life for an incorrect guess
         }
 
         gameState.alreadyGuessed[guessedChar - 'a'] = true; // adds the guessed letter to the direct address table for duplicate checking
+        gameState.guesses++;
 
-        //displays word in progress, correct, incorrect, and total guesses
+        //displays word in progress, correct, incorrect, and lives
         System.out.println();
         PrintCharArray(gameState.wordInProgress);
         System.out.print("Correct guesses: ");
         PrintCharArray(gameState.correctGuesses);
         System.out.print("Incorrect guesses: ");
         PrintCharArray(gameState.incorrectGuesses);    
-        gameState.guesses++;
-        System.out.println("Total guesses: " + gameState.guesses + " out of " + gameState.totalGuesses + "\n");
+        //System.out.println("Total guesses: " + gameState.guesses + " out of " + gameState.totalGuesses + "\n"); //old guessing system based on number of guesses
+        System.out.println("You have " + gameState.lives + " lives left.\n");
     }
         
     public static char ValidateGuess(GameState gameState, char guessedChar) {
@@ -155,7 +159,7 @@ public class Hangman {
         return gameState.alreadyGuessed[index]; // checks if the guessed letter has already been guessed using a direct address table
     }
 
-    public static boolean UserHasWon(GameState gameState, char[] word) {
+    public static boolean UserHasWon(GameState gameState) {
         return gameState.correctLetters == gameState.wordLength; // user wins if the number of correct letters guessed is equal to the length of the word
     }
 }

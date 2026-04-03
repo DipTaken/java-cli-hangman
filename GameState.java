@@ -5,11 +5,12 @@ public class GameState {
     public final char[] wordInProgress;
     public final char[] correctGuesses;
     public final char[] incorrectGuesses;
-    public final int totalGuesses;
+    
     public final int wordLength;
     public final boolean[] characterMap;
 
     public int guesses = 0;
+    public int lives;
     public int correctLetters = 0;
     public int correctGuessesIndex = 0;
     public int incorrectGuessesIndex = 0;
@@ -19,8 +20,8 @@ public class GameState {
         this.word = targetWord;
         this.wordLength = targetWord.length;
         this.characterMap = GenerateCharacterMap(targetWord);
-        this.totalGuesses = wordLength + wordLength / 2; // 1.5 times the length of the word
-        
+        this.lives = 7 + (wordLength / 5); // gives more lives for longer words
+
         this.correctGuesses = new char[ALPHABET_SIZE];
         this.incorrectGuesses = new char[ALPHABET_SIZE];
         //creates an array for storing correct/incorrect guesses and populates with blankspace so that NULL does not display.
