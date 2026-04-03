@@ -5,7 +5,6 @@ public class GameState {
     public final char[] wordInProgress;
     public final char[] correctGuesses;
     public final char[] incorrectGuesses;
-    
     public final int wordLength;
     public final boolean[] characterMap;
 
@@ -32,7 +31,13 @@ public class GameState {
         this.wordInProgress = new char[wordLength];
         for (int i = 0; i < wordLength; i++) {
             //populates with underscores unless there is a special char
-            wordInProgress[i] = (word[i] >= 'a' && word[i] <= 'z') ? '_' : word[i];
+            if (word[i] >= 'a' && word[i] <= 'z') {
+                wordInProgress[i] = '_';
+            } 
+            else {
+                wordInProgress[i] = word[i];
+                this.correctLetters++; //counts special characters since user does not have to guess them
+            }
         }
     }
 

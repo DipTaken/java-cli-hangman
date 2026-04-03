@@ -20,7 +20,7 @@ public class Hangman {
 			}
 			if (gameChoice == 1) {
 				System.out.println("Choosing word...");
-                System.out.println("Choice made.");
+                System.out.println("Choice made.\n");
                 char[] word = PickRandomWord(words); //pick a word from word bank and store each individual letter into an element of the array
                 //PrintCharArray(word); //debug
                 Game(word);
@@ -35,14 +35,13 @@ public class Hangman {
 	public static void Game(char[] word) {	
         //initializes the game state; holds word and all relevant information about the game
         GameState gameState = new GameState(word);
-        System.out.println();
         
         //UI-guessing
         PrintCharArray(gameState.wordInProgress);
-        //System.out.println("You have " + gameState.totalGuesses + " guesses to get the word.\n"); //old guessing system based on number of guesses
         System.out.println("You have " + gameState.lives + " lives to get the word!\n");
 
         //main loop
+        boolean won = false;
         while (gameState.lives > 0) { //continues until user runs out of lives
             System.out.print("Make a guess! "); // asks for a guess
             char guessedChar = GrabChar();
@@ -54,6 +53,7 @@ public class Hangman {
                 System.out.print("The word was: ");
                 PrintCharArray(word);
                 System.out.println();
+                won = true;
                 break;
             }
 
@@ -61,7 +61,7 @@ public class Hangman {
         }
 
         //if user did not win
-        if (!UserHasWon(gameState)) {
+        if (!won) {
             System.out.println("You did not get the word correct.");
             System.out.print("The word was: ");
             PrintCharArray(word);
@@ -105,7 +105,6 @@ public class Hangman {
         PrintCharArray(gameState.correctGuesses);
         System.out.print("Incorrect guesses: ");
         PrintCharArray(gameState.incorrectGuesses);    
-        //System.out.println("Total guesses: " + gameState.guesses + " out of " + gameState.totalGuesses + "\n"); //old guessing system based on number of guesses
         System.out.println("You have " + gameState.lives + " lives left.\n");
     }
         

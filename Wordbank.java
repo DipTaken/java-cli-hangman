@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Wordbank {
@@ -8,22 +9,18 @@ public class Wordbank {
         //grabbing words from file
         File wordBankFile = new File(fileName);
         Scanner fileReader = new Scanner(wordBankFile);
+        ArrayList<String> wordsList = new ArrayList<>(); //list to store words
+
         //counting the number of words
-        int lines = 0;
         while (fileReader.hasNextLine()) {
-            if (!fileReader.nextLine().isEmpty()) lines++;
+            String line = fileReader.nextLine(); //reads each line of the file
+            if (!line.isEmpty()) wordsList.add(line); //adds non-empty lines to the list
             //System.out.println(lines); //debug
         }
         fileReader.close();
 
         //assigning words to an array of length of lines in the file
-        fileReader = new Scanner(wordBankFile);
-        String[] wordBank = new String[lines];
-        for (int i = 0; i < wordBank.length; i++) {
-            wordBank[i] = fileReader.nextLine();
-        }
-        fileReader.close();
-        return wordBank;
+        return wordsList.toArray(new String[0]);
     }
 
     public String[] InitializeWordBank() throws Exception {
